@@ -1,0 +1,87 @@
+<krpano>
+    <style name="hotspot_style"
+           height="110"
+           width="110"
+           scale="0.5" />
+    <style name="gif_forward"
+           onloaded="hotspot_animate(128, 128, 60);hotspot_label();"
+           url="%$MANIFESTPATH%/hotspot/animation_forward.png" />
+    <style name="gif_left"
+           onloaded="hotspot_animate(128, 128, 60);"
+           url="%$MANIFESTPATH%/hotspot/animation_left.png" />
+    <style name="gif_right"
+           onloaded="hotspot_animate(128, 128, 60);"
+           url="%$MANIFESTPATH%/hotspot/animation_right.png" />
+    <style name="gif_point"
+           onloaded="hotspot_animate(128, 128, 60);"
+           url="%$MANIFESTPATH%/hotspot/animation_point.png" />
+    <style name="gif_circle"
+           onloaded="hotspot_animate(128, 128, 60);"
+           url="%$MANIFESTPATH%/hotspot/animation_circle.png" />
+    <style name="gif_aerial"
+           onloaded="hotspot_animate(128, 128, 60);"
+           url="%$MANIFESTPATH%/hotspot/animation_aerial.png" />
+    <style name="gif_poi"
+           onloaded="hotspot_animate(128, 128, 60);"
+           url="%$MANIFESTPATH%/hotspot/animation_poi.png" />
+    <style name="img_link"
+           url="%$MANIFESTPATH%/hotspot/static_link.png" />
+    <style name="img_video"
+           url="%$MANIFESTPATH%/hotspot/static_video.png" />
+    <style name="img_music"
+           url="%$MANIFESTPATH%/hotspot/static_music.png" />
+    <style name="img_image"
+           url="%$MANIFESTPATH%/hotspot/static_gallery.png" />
+    <style name="img_information"
+           url="%$MANIFESTPATH%/hotspot/static_text.png" />
+    <style name="hotspot_label_style"
+           type="text"
+           keep="false"
+           enabled="false"
+           background="true"
+           backgroundcolor="0x000000"
+           backgroundalpha="0.3"
+           roundedge="4"
+           border="false"
+           oy="-40"
+           vcenter="true"
+           maskchildren="true"
+           css="text-align:center;color:#ffffff;font-size:12px;line-height:18px;padding:0 5px;" />
+    <action name="hotspot_label">
+        trace("label");
+        set(name, calc('hotspot_label_' + name));
+        addhotspot(get(name));
+        copy(hotspot[get(name)].ath, ath);
+        copy(hotspot[get(name)].atv, atv);
+        copy(hotspot[get(name)].linkedscene, linkedscene);
+        copy(hotspot[get(name)].visible, visible);
+        copy(hotspot[get(name)].html, scene[get(linkedscene)].title);
+        hotspot[get(name)].loadStyle(hotspot_label_style);
+    </action>
+    <action name="hotspot_animate">
+        registerattribute(framesX, calc((imagewidth / %1) BOR 0));
+        registerattribute(framesY, calc((imageheight / %2) BOR 0));
+        registerattribute(frames, calc(framesX * framesY));
+        registerattribute(frame, 0);
+        set(crop, '0|0|%1|%2');
+        setinterval(calc('hotspot_animation_' + name), calc(1.0 / %3),
+            if(loaded,
+                inc(frame);
+                if(frame GE frames,
+                    if(onlastframe !== null,
+                        onlastframe()
+                    );
+                    set(frame, 0);
+                );
+                mod(positionX, frame, framesX);
+                div(positionY, frame, framesX);
+                Math.floor(positionY);
+                mul(positionX, %1);
+                mul(positionY, %2);
+                calc(crop, positionX + '|' + positionY + '|%1|%2');
+            ,
+                clearinterval(calc('hotspot_animation_' + name));
+            );
+        );
+    </action>
+</krpano>

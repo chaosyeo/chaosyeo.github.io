@@ -1,0 +1,33 @@
+<krpano>
+  <plugin name="soundinterface" keep="true"
+          url="../krp/plugins/soundinterface.swf"
+          alturl="../krp/plugins/soundinterface.js"
+          rootpath="/static/music"
+          preload="true"
+          onloaded="preloadsound('music.mp3'));"
+  />
+  <action name="skin_sound_init">
+    ifnot(skin_sound_initialize,
+      playsound(music, 'music.mp3', 1);
+      set(skin_sound_initialize, true);
+    );
+  </action>
+  <action name="skin_sound_play">
+    ifnot(skin_sound_initialize,
+      playsound(music, 'music.mp3', 1);
+      set(skin_sound_initialize, true);
+    );
+    resumesound(music)
+  </action>
+  <action name="skin_sound_stop">
+    ifnot(skin_sound_initialize,
+      playsound(music, 'music.mp3', 1);
+      set(skin_sound_initialize, true);
+    );
+    pausesound(music);
+  </action>
+  <events name="skin_music_events" keep="true"
+          onxmlcomplete="set(events[skin_music_events].onxmlcomplete, null); skin_sound_init();"
+          onmousedown="set(events[skin_music_events].onmousedown, null); skin_sound_init();"
+  />
+</krpano>

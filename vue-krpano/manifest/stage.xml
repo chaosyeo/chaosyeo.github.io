@@ -1,0 +1,3 @@
+<krpano>
+  <krpano stagescale="calc:stagescale * 2" if="stagescale LT 1.0" devices="mobile" />
+</krpano>

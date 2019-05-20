@@ -1,0 +1,36 @@
+<krpano showerrors="true" debugmode="true" logkey="true">
+    <include url="%$MANIFESTPATH%/display.xml" />
+    <include url="%$MANIFESTPATH%/loadscene.xml" />
+    <include url="%$MANIFESTPATH%/control.xml" />
+    <include url="%$MANIFESTPATH%/cursors.xml" />
+    <include url="%$MANIFESTPATH%/stage.xml" />
+    <include url="%$MANIFESTPATH%/autorotate.xml" />
+    <include url="%$MANIFESTPATH%/contextmenu.xml" />
+    <include url="%$MANIFESTPATH%/gyro.xml" />
+    <include url="%$MANIFESTPATH%/hotspot.xml" />
+    <include url="%$MANIFESTPATH%/planet.xml" />
+
+  <!--<include url="%$MANIFESTPATH%/thumbnail.xml" />-->
+  <!--<include url="%$MANIFESTPATH%/sandmap.xml" />-->
+  <!--<include url="%$MANIFESTPATH%/music.xml" />-->
+  <!--<include url="%$MANIFESTPATH%/vr.xml" />-->
+	<action name="startup" autorun="onstart">
+		if(startscene === null OR !scene[get(startscene)], copy(startscene,scene[0].name); );
+		loadscene(get(startscene), null, MERGE);
+		if(startactions !== null, startactions());
+        planet_startup();
+	</action>
+	<!--<action name="skin_startup" scope="local">-->
+		<!--if(!device.desktop AND device.html5,-->
+			<!--copy(plugin[skin_gyro].url, plugin[skin_gyro].html5_url);-->
+		<!--);-->
+		<!--if(device.html5 AND device.webgl,-->
+			<!--copy(plugin[webvr].url, plugin[webvr].plugin_url);-->
+		<!--);-->
+    <!--skin_thumbnail_initialize();-->
+  <!--</action>-->
+	<!--<events name="skin_events" keep="true"-->
+	        <!--onxmlcomplete="set(events[skin_events].onxmlcomplete,null); skin_startup();"-->
+	        <!--/>-->
+  <include url="/static/scenes.xml"/>
+</krpano>

@@ -1,0 +1,15 @@
+<krpano>
+    <display autofullscreen="false"
+             stereo="false"
+             stereooverlap="0.0"
+             stereoscale="1.0"
+             monoside="1"
+             anaglyph="false"
+             hardwarelimit=""
+             usedesktopimages="false"
+             mipmapping="auto"
+             loadwhilemoving=""
+             framebufferscale="1.0"
+             hotspotvrrendering="natural"
+             safearea="h-only"/>
+</krpano>

@@ -1,0 +1,15 @@
+<krpano>
+    <autorotate enabled="false"
+                waittime="3"
+                accel="1.0"
+                speed="10.0"
+                horizon="off"
+                tofov="off"
+                zoomslowdown="true"
+                interruptionevents="userviewchange|layers|keyboard"
+                devices="desktop" />
+    <events name="autorotate_event"
+            keep="true"
+            onautorotateoneround="nextscene(+1);"
+            devices="desktop" />
+</krpano>

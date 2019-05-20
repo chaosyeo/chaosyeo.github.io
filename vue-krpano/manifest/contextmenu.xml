@@ -1,0 +1,127 @@
+<krpano>
+    <contextmenu fullscreen="true"
+                 native="false"
+                 touch="true"
+                 versioninfo="false"
+                 enterfs="全屏浏览"
+                 exitfs="退出全屏">
+        <item name="contextmenu_item_version"
+              caption=""
+              pattern="51VRYUN_VER_%BRGVERSION%"
+              enabled="false" />
+        <item name="contextmenu_item_fullscreen"
+              caption="FULLSCREEN" />
+        <item name="contextmenu_item_normal"
+              caption="正常视角"
+              separator="true"
+              onclick="contextmenu_view_normal();" />
+        <item name="contextmenu_item_fisheye"
+              caption="鱼眼视角"
+              onclick="contextmenu_view_fisheye();" />
+        <item name="contextmenu_item_stereographic"
+              caption="立体视角"
+              onclick="contextmenu_view_stereographic();" />
+        <item name="contextmenu_item_architectural"
+              caption="建筑视角"
+              onclick="contextmenu_view_architectural();" />
+        <item name="contextmenu_item_pannini"
+              caption="帕尼尼视角"
+              onclick="contextmenu_view_pannini();" />
+        <item name="contextmenu_item_littleplanet"
+              caption="小行星视角"
+              onclick="contextmenu_view_littleplanet();" />
+        <item name="contextmenu_item_control"
+              caption="更改控制模式"
+              separator="true"
+              onclick="contextmenu_switch_control_mode();" />
+        <item name="contextmenu_item_mode"
+              caption=""
+              pattern="当前控制模式: %MODE%"
+              enabled="false" />
+    </contextmenu>
+
+    <action name="contextmenu_switch_control_mode" scope="local">
+        switch(control.mouse, moveto, drag);
+        switch(control.touch, moveto, drag);
+    </action>
+    <action name="contextmenu_view_common" scope="local">
+        if(view.vlookat LT -80 OR view.vlookat GT +80,
+            tween(view.vlookat, 0.0, 1.0, easeInOutSine);
+            tween(view.fov, 100, distance(150, 0.8));
+        );
+    </action>
+    <action name="contextmenu_view_normal" scope="local">
+        contextmenu_view_common();
+        set(view.mode, 'normal');
+        tween(view.architectural, 0.0, distance(1.0, 0.5));
+        tween(view.pannini, 0.0, distance(1.0, 0.5));
+        tween(view.fisheye, 0.0, distance(1.0, 0.5));
+    </action>
+    <action name="contextmenu_view_architectural" scope="local">
+        contextmenu_view_common();
+        set(view.mode, 'architectural');
+        tween(view.architectural, 1.0, distance(1.0, 0.5));
+        tween(view.pannini, 0.0, distance(1.0, 0.5));
+        tween(view.fisheye, 0.0, distance(1.0, 0.5));
+    </action>
+    <action name="contextmenu_view_fisheye" scope="local">
+        contextmenu_view_common();
+        set(view.mode, 'fisheye');
+        tween(view.architectural, 0.0, distance(1.0, 0.5));
+        tween(view.pannini, 0.0, distance(1.0, 0.5));
+        tween(view.fisheye, 0.35, distance(1.0, 0.5));
+    </action>
+    <action name="contextmenu_view_stereographic" scope="local">
+        contextmenu_view_common();
+        set(view.mode, 'stereographic');
+        tween(view.architectural, 0.0, distance(1.0, 0.5));
+        tween(view.pannini, 0.0, distance(1.0, 0.5));
+        tween(view.fisheye, 1.0, distance(1.0, 0.8));
+    </action>
+    <action name="contextmenu_view_pannini" scope="local">
+        contextmenu_view_common();
+        set(view.mode, 'pannini');
+        tween(view.architectural, 0.0, distance(1.0, 0.5));
+        tween(view.pannini, 1.0, distance(1.0, 0.8));
+        if(view.fisheye LT 0.1,
+            tween(view.fisheye, 1.0, distance(1.0, 0.8));
+        );
+    </action>
+    <action name="contextmenu_view_littleplanet" scope="local">
+        set(view.mode, 'littleplanet');
+        tween(view.architectural, 0.0, distance(1.0, 0.5));
+        tween(view.pannini, 0.0, distance(1.0, 0.5));
+        tween(view.fisheye, 1.0, distance(1.0, 0.8));
+        tween(view.fov, 150, distance(150,0.8));
+        tween(view.vlookat, 90, distance(100,0.8));
+        add(hlookat, view.hlookat, 123.0);
+        tween(view.hlookat, get(hlookat), distance(100, 0.8));
+    </action>
+    <events name="contextmenu_events"
+            keep="true"
+            oncontextmenu="contextmenu_events_oncontextmenu();" />
+    <action name="contextmenu_events_oncontextmenu" scope="local">
+        txtreplace(versioninfo, contextmenu.item[contextmenu_item_version].pattern, '%BRGVERSION%', get(BRGVERSION));
+        copy(contextmenu.item[contextmenu_item_version].caption, versioninfo);
+        if(control.mouse == 'drag',
+            set(MODE, '拖拽');
+        ,
+            set(MODE, '指向');
+        );
+        txtreplace(modeinfo, contextmenu.item[contextmenu_item_mode].pattern, '%MODE%', get(MODE));
+        copy(contextmenu.item[contextmenu_item_mode].caption, modeinfo);
+        if(!view.mode,
+            set(view.mode, 'normal');
+        );
+        contextmenu_switch_view_mode();
+    </action>
+    <action name="contextmenu_switch_view_mode" scope="local">
+        set(contextmenu.item[contextmenu_item_normal].enabled, true);
+        set(contextmenu.item[contextmenu_item_architectural].enabled, true);
+        set(contextmenu.item[contextmenu_item_fisheye].enabled, true);
+        set(contextmenu.item[contextmenu_item_stereographic].enabled, true);
+        set(contextmenu.item[contextmenu_item_pannini].enabled, true);
+        set(contextmenu.item[contextmenu_item_littleplanet].enabled, true);
+        set(contextmenu.item[calc('contextmenu_item_' + view.mode)].enabled, false);
+    </action>
+</krpano>

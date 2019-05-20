@@ -1,0 +1,29 @@
+<krpano>
+    <plugin name="gyro"
+            keep="true"
+            url="%$BASEPATH%/plugins/gyro2.js"
+            enabled="false"
+            camroll="true"
+            friction="0.0"
+            touch_mode="horizontaloffset"
+            sensor_mode="1"
+            softstart="0.5"
+            autocalibration="false"
+            devices="mobile" />
+    <events name="gyro_events"
+            gyro_onavailable=""
+            gyro_onunavailable="gyro_events_onunavailable();"
+            devices="mobile" />
+    <action name="gyro_events_onavailable" scope="local" devices="mobile">
+        gyro_enabled();
+    </action>
+    <action name="gyro_events_onunavailable" scope="local" devices="mobile">
+        gyro_disabled();
+    </action>
+    <action name="gyro_enabled" scope="local" devices="mobile">
+        set(plugin[gyro].enabled, true);
+    </action>
+    <action name="gyro_disabled" scope="local" devices="mobile">
+        set(plugin[gyro].enabled, false);
+    </action>
+</krpano>

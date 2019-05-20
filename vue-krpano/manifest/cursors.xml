@@ -1,0 +1,17 @@
+<krpano>
+    <cursors standard="default"
+             dragging="move"
+             moving="move"
+             url=""
+             type="8way"
+             move=""
+             drag=""
+             arrow_l=""
+             arrow_r=""
+             arrow_u=""
+             arrow_d=""
+             arrow_lu=""
+             arrow_ru=""
+             arrow_ld=""
+             arrow_rd="" />
+</krpano>

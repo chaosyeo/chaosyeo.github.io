@@ -1,0 +1,103 @@
+<krpano>
+  <layer name="skin_sandmap"
+         url="/static/manifest/sandmap_resource/sandmap.png"
+         keep="true" handcursor="false" capture="false" align="rightcenter"
+         scale="0.2" x="50" scalechildren="true" onclick="openmap();" visible="false" />
+  <action name="openmap">
+    set(layer[skin_sandmap].onclick, closemap(););
+    layer[skin_sandmap].changeorigin(center,center);
+    set(bigscale,1);
+    if(layer[skin_sandmap].imageheight GT stageheight,
+      div(bigscale2, stageheight, layer[skin_sandmap].imageheight);
+    );
+    if(layer[skin_sandmap].imagewidth GT stagewidth,
+      div(bigscale1, stagewidth, layer[skin_sandmap].imagewidth);
+    );
+    if(bigscale1 GT bigscale2,
+      copy(bigscale, bigscale2);
+    ,
+      copy(bigscale, bigscale1);
+    );
+    if(bigscale GT 0.5,
+      set(bigscale, 0.5);
+    );
+    tween(layer[skin_sandmap].x, 0);
+    tween(layer[skin_sandmap].y, 0);
+    tween(layer[skin_sandmap].scale, get(bigscale));
+  </action>
+
+  <style name="mapspot" keep="true" url="/static/manifest/sandmap_resource/radar-out.png" parent="skin_sandmap" align="lefttop" edge="center" width="50" height="50" onclick="skin_loadscene(get(sceneindex));" zorder="1" />
+  <layer sceneindex="0" style="mapspot" name="skin_sandmap_spot_0" x="760" y="1100"/>
+  <layer sceneindex="1" style="mapspot" name="skin_sandmap_spot_1" x="760" y="920" />
+  <layer sceneindex="2" style="mapspot" name="skin_sandmap_spot_2" x="890" y="920" />
+  <layer sceneindex="3" style="mapspot" name="skin_sandmap_spot_3" x="890" y="1000" />
+  <layer sceneindex="4" style="mapspot" name="skin_sandmap_spot_4" x="890" y="840" />
+  <layer sceneindex="5" style="mapspot" name="skin_sandmap_spot_5" x="1020" y="770" />
+  <layer sceneindex="6" style="mapspot" name="skin_sandmap_spot_6" x="760" y="770" />
+  <layer sceneindex="7" style="mapspot" name="skin_sandmap_spot_7" x="890" y="700" />
+  <layer sceneindex="8" style="mapspot" name="skin_sandmap_spot_8" x="1020" y="600" />
+  <layer sceneindex="9" style="mapspot" name="skin_sandmap_spot_9" x="760" y="600" />
+  <layer sceneindex="10" style="mapspot" name="skin_sandmap_spot_10" x="830" y="530" />
+  <layer sceneindex="11" style="mapspot" name="skin_sandmap_spot_11" x="940" y="500" />
+  <layer sceneindex="12" style="mapspot" name="skin_sandmap_spot_12" x="1020" y="440" />
+  <layer sceneindex="13" style="mapspot" name="skin_sandmap_spot_13" x="960" y="350" />
+  <layer sceneindex="14" style="mapspot" name="skin_sandmap_spot_14" x="1020" y="280" />
+  <layer sceneindex="15" style="mapspot" name="skin_sandmap_spot_15" x="760" y="380" />
+  <layer sceneindex="16" style="mapspot" name="skin_sandmap_spot_16" x="820" y="400" />
+  <layer sceneindex="17" style="mapspot" name="skin_sandmap_spot_17" x="760" y="280" />
+  <layer sceneindex="18" style="mapspot" name="skin_sandmap_spot_18" x="600" y="280" />
+  <layer sceneindex="19" style="mapspot" name="skin_sandmap_spot_19" x="620" y="220" />
+  <layer sceneindex="20" style="mapspot" name="skin_sandmap_spot_20" x="560" y="220" />
+  <layer sceneindex="21" style="mapspot" name="skin_sandmap_spot_21" x="710" y="440" />
+  <layer sceneindex="22" style="mapspot" name="skin_sandmap_spot_22" x="670" y="340" />
+  <layer sceneindex="23" style="mapspot" name="skin_sandmap_spot_23" x="600" y="440" />
+  <layer sceneindex="24" style="mapspot" name="skin_sandmap_spot_24" x="540" y="340" />
+  <layer sceneindex="25" style="mapspot" name="skin_sandmap_spot_25" x="400" y="340" />
+  <layer sceneindex="26" style="mapspot" name="skin_sandmap_spot_26" x="350" y="410" />
+  <layer sceneindex="27" style="mapspot" name="skin_sandmap_spot_27" x="280" y="360" />
+  <layer sceneindex="28" style="mapspot" name="skin_sandmap_spot_28" x="190" y="380" />
+  <layer sceneindex="29" style="mapspot" name="skin_sandmap_spot_29" x="160" y="490" />
+  <layer sceneindex="30" style="mapspot" name="skin_sandmap_spot_30" x="240" y="590" />
+  <layer sceneindex="31" style="mapspot" name="skin_sandmap_spot_31" x="240" y="490" />
+  <layer sceneindex="32" style="mapspot" name="skin_sandmap_spot_32" x="380" y="590" />
+  <layer sceneindex="33" style="mapspot" name="skin_sandmap_spot_33" x="400" y="510" />
+  <layer sceneindex="34" style="mapspot" name="skin_sandmap_spot_34" x="600" y="570" />
+  <layer sceneindex="35" style="mapspot" name="skin_sandmap_spot_35" x="540" y="510" />
+  <layer sceneindex="36" style="mapspot" name="skin_sandmap_spot_36" x="670" y="510" />
+  <layer sceneindex="37" style="mapspot" name="skin_sandmap_spot_37" x="710" y="770" />
+  <layer sceneindex="38" style="mapspot" name="skin_sandmap_spot_38" x="670" y="700" />
+  <layer sceneindex="39" style="mapspot" name="skin_sandmap_spot_39" x="540" y="770" />
+  <layer sceneindex="40" style="mapspot" name="skin_sandmap_spot_40" x="540" y="700" />
+  <layer sceneindex="41" style="mapspot" name="skin_sandmap_spot_41" x="400" y="770" />
+  <layer sceneindex="42" style="mapspot" name="skin_sandmap_spot_42" x="400" y="700" />
+  <layer sceneindex="43" style="mapspot" name="skin_sandmap_spot_43" x="290" y="770" />
+  <layer sceneindex="44" style="mapspot" name="skin_sandmap_spot_44" x="260" y="700" />
+  <layer sceneindex="45" style="mapspot" name="skin_sandmap_spot_45" x="200" y="700" />
+  <layer sceneindex="46" style="mapspot" name="skin_sandmap_spot_47" x="230" y="920" />
+  <layer sceneindex="47" style="mapspot" name="skin_sandmap_spot_49" x="560" y="920" />
+
+  <layer name="activemapspot" x="0" y="0" align="lefttop" width="50" height="50" zorder="3" url="/static/manifest/sandmap_resource/radar-active.png" />
+  <layer name="radar" keep="true" url.flash="../krp/plugins/radar.swf" url.html5="../krp/plugins/radar.js" align="center" zorder="1" scale.mobile="1.5" fillalpha="0.5" fillcolor="0x7F5F3F" linewidth="1.0" linecolor="0xE0E0A0" linealpha="0.5"/>
+  <action name="closemap">
+    set(layer[skin_sandmap].onclick, openmap(); ); layer[skin_sandmap].changeorigin(rightcenter,rightcenter); tween(layer[skin_sandmap].x, 50); tween(layer[skin_sandmap].y, 0); tween(layer[skin_sandmap].scale, 0.2);
+  </action>
+  <action name="skin_sandmap_active">
+    for(set(index, 0), index LT scene.count, inc(index),
+      if(layer[get(calc('skin_sandmap_spot_' + index))],
+        if(xml.scene === scene[get(index)].name,
+          set(layer[activemapspot].parent, get(calc('skin_sandmap_spot_' + index)));
+          set(layer[radar].parent, get(calc('skin_sandmap_spot_' + index)));
+        );
+      );
+    );
+  </action>
+  <active name="skin_sandmap_show">
+    set(layer[skin_sandmap].visible, true);
+  </active>
+  <active name="skin_sandmap_hide">
+    closemap();
+    set(layer[skin_sandmap].visible, false);
+  </active>
+  <events name="skin_sandmap_events" keep="true"
+          onnewscene="skin_sandmap_active();"/>
+</krpano>

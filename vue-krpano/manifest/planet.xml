@@ -1,0 +1,53 @@
+<krpano>
+    <action name="planet_startup" scope="local">
+        set(global.planet,
+            scene = get(xml.scene),
+            hlookat = get(view.hlookat),
+            vlookat = get(view.vlookat),
+            fov =get(view.fov),
+            fovmax = get(view.fovmax),
+            limitview = get(view.limitview)
+        );
+        set(view,
+            fovmax = 170,
+            limitview = lookto,
+            vlookatmin = 90,
+            vlookatmax = 90
+        );
+        planet_hotspots_visible(false);
+        lookat(calc(global.planet.hlookat - 180), 90, 150, 1, 0, 0);
+        set(events[planet_events].onloadcomplete,
+            delayedcall(0.5,
+                if(global.planet.scene === xml.scene,
+                    set(countrol.usercontrol, off);
+                    set(view,
+                        limitview = get(global.planet.limitview),
+                        vlookatmin = null,
+                        vlookatmax = null
+                    );
+                    tween(view.hlookat|view.vlookat|view.fov|view.distortion, calc('' + global.planet.hlookat + '|' + global.planet.vlookat + '|' + global.planet.fov + '|' + 0.0), 3.0, easeOutQuad,
+                        set(control.usercontrol, all);
+                        tween(view.fovmax, get(global.planet.fovmax));
+                        delete(global.planet);
+                        planet_hotspots_visible(true);
+                    );
+                );
+            );
+        );
+    </action>
+    <action name="planet_hotspots_visible">
+        for(set(index, 0), index LT hotspot.count, inc(index),
+            if(%1 == false,
+                if(hotspot[get(index)].visible == true,
+                    trace(hotspot[get(index)].name);
+                    set(hotspot[get(index)].marked, true);
+                    set(hotspot[get(index)].visible, %1);
+                );
+            ,
+                if(hotspot[get(index)].marked == true,
+                    set(hotspot[get(index)].visible, %1);
+                );
+            );
+        );
+    </action>
+</krpano>

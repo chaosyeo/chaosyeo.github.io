@@ -1,0 +1,380 @@
+<krpano>
+
+	<include url="%$BASEPATH%/plugins/webvr.xml" devices="html5" />
+
+
+	<!-- skin_vr_control module -->
+	<style name="skin_vr_control_style" depth="800" scale="0.2" distorted="true" ath="0" atv="45" alpha="0.25" visible="false" />
+
+	<hotspot name="skin_vr_control_background" style="skin_vr_control_style" keep="true"
+		zorder="5" url="vr_resource/vr_control_background.png" width="600" height="120"
+		onover="skin_vr_control_action_onover();" onout="skin_vr_control_action_onout();" handcursor="false" />
+
+	<hotspot name="skin_vr_control_home" style="skin_vr_control_style" keep="true"
+		zorder="6" url="vr_resource/vr_control.png" crop="0|0|280|100"
+		onover="skin_vr_control_action_onover(); delayedcall(0,tween(alpha,0.75,0.1));" onout="skin_vr_control_action_onout();"
+		startupxml="%FIRSTXML%/manifest.xml" vr_timeout="1000" onclick="skin_vr_control_action_loadhome();" />
+
+	<hotspot name="skin_vr_control_previous" style="skin_vr_control_style" keep="true"
+		zorder="6" url="vr_resource/vr_control.png" crop="280|0|100|100" ox="-48"
+		onover="skin_vr_control_action_onover(); delayedcall(0,tween(alpha,0.75,0.1));" onout="skin_vr_control_action_onout();"
+		vr_timeout="700" onclick="skin_nextscene_loop(-1);" />
+
+	<hotspot name="skin_vr_control_next" style="skin_vr_control_style" keep="true"
+		zorder="6" url="vr_resource/vr_control.png" crop="380|0|100|100" ox="+48"
+		onover="skin_vr_control_action_onover(); delayedcall(0,tween(alpha,0.75,0.1));" onout="skin_vr_control_action_onout();"
+		vr_timeout="700" onclick="skin_nextscene_loop(+1);" />
+
+	<action name="skin_vr_control_action_onover">
+		callwith(hotspot[skin_vr_control_background],   tween(alpha|depth,1.0|650); );
+		callwith(hotspot[skin_vr_control_home], tween(alpha|depth,0.5|650); );
+		callwith(hotspot[skin_vr_control_previous],    tween(alpha|depth,0.5|650); );
+		callwith(hotspot[skin_vr_control_next],    tween(alpha|depth,0.5|650); );
+	</action>
+
+	<action name="skin_vr_control_action_onout">
+		callwith(hotspot[skin_vr_control_background],   tween(alpha|depth,0.25|800); );
+		callwith(hotspot[skin_vr_control_home], tween(alpha|depth,0.25|800); );
+		callwith(hotspot[skin_vr_control_previous],    tween(alpha|depth,0.25|800); );
+		callwith(hotspot[skin_vr_control_next],    tween(alpha|depth,0.25|800); );
+	</action>
+
+	<action name="skin_vr_control_action_loadhome">
+		skin_loadscene(get(scene[0].name));
+	</action>
+
+	<action name="skin_vr_control_setvisibility">
+		set(hotspot[skin_vr_control_background].visible,   %1);
+		set(hotspot[skin_vr_control_home].visible, %1);
+		if(scene.count GT 1,
+			set(hotspot[skin_vr_control_background].width, 600);
+			set(hotspot[skin_vr_control_previous].visible, %1);
+			set(hotspot[skin_vr_control_next].visible, %1);
+		  ,
+			set(hotspot[skin_vr_control_background].width, 320);
+			set(hotspot[skin_vr_control_previous].visible, false);
+			set(hotspot[skin_vr_control_next].visible, false);
+		  );
+	</action>
+
+	<events name="skin_vr_control_event" keep="true" onviewchange="skin_vr_control_action_following();"  />
+
+	<!-- new krp 1.19 feature: Javascript actions (can be faster than xml actions, HTML5 only) -->
+	<action name="skin_vr_control_action_following" type="Javascript" devices="html5"><![CDATA[
+
+		var hs1 = krpano.get("hotspot[skin_vr_control_background]");
+		var hs2 = krpano.get("hotspot[skin_vr_control_home]");
+		var hs3 = krpano.get("hotspot[skin_vr_control_previous]");
+		var hs4 = krpano.get("hotspot[skin_vr_control_next]");
+
+		if(!hs1.hovering && !hs2.hovering && !hs3.hovering && !hs4.hovering)
+		{
+			var f = 0.01;	// follow speed factor
+
+			var h = krpano.view.hlookat;
+			var v = krpano.view.vlookat;
+			var hsh = hs1.ath;
+			var hsv = hs1.atv;
+
+			// map to -180 to +180
+			h   = (h  -(h|0))   + (((h|0)  +360180)%360) - 180.0;
+			hsh = (hsh-(hsh|0)) + (((hsh|0)+360180)%360) - 180.0;
+
+			// get the shortest horizontal distance
+			dh = h - hsh;
+			dh += (dh>180) ? -360 : (dh<-180) ? 360 : 0
+
+			// follow slowing horizontally
+			hsh += dh*f;
+
+			// fade out when farther away
+			var a = Math.abs(v - hs1.atv) / 90.0;
+			a = 0.5 * Math.max(1.0 - 2.0*Math.sqrt(a), 0);
+
+			// move up the more looking down
+			v = v + 55.0 - v*1.5;
+			hsv = hsv*(1-f) + v*f;
+
+			// set everything
+			hs2.alpha = hs1.alpha = a;
+			if(!hs3.hovering) hs3.alpha = a;
+			if(!hs4.hovering) hs4.alpha = a;
+			hs4.ath = hs3.ath = hs2.ath = hs1.ath = hsh;
+			hs4.atv = hs3.atv = hs2.atv = hs1.atv = hsv;
+		}
+
+	]]></action>
+
+	<!-- reload the scene when there is a special image for VR -->
+	<action name="skin_reloadscene_webvr" scope="local">
+		delayedcall(0.1,
+			if(scene[get(xml.scene)].havevrimage,
+				loadscene(get(xml.scene), null, MERGE|KEEPVIEW|KEEPMOVING|KEEPPLUGINS|KEEPHOTSPOTS, BLEND(0.5));
+			);
+		);
+	</action>
+
+	<plugin name="WebVR" keep="true" devices="html5"
+		plugin_url="../krp/plugins/webvr.js"
+		url=""
+		multireslock.desktop="true"
+		multireslock.mobile.or.tablet="false"
+		mobilevr_support="true"
+		mobilevr_fake_support="true"
+		mobilevr_wakelock="false"
+		onavailable="skin_webvr_onavailable();"
+		onentervr="webvr_onentervr(); skin_webvr_setup(); skin_reloadscene_webvr();removelayer(layer[webvr_enterbutton]);"
+		onexitvr="webvr_onexitvr(); skin_webvr_setup(); skin_reloadscene_webvr();removelayer(layer[webvr_enterbutton]);"/>
+
+	<layer name="webvr_rotate_to_landscape_request" enabled="false" type="container" keep="true" align="lefttop" width="100%" height="100%" vr="true" bgalpha="1" autoalpha="true" alpha="0" bgcolor="0x141720" devices="mobile">
+		<layer name="advise" enabled="false" keep="true" vr="true" devices="mobile" url="vr_resource/rotate.gif" align="center" height="120" width="120" y="-50" />
+		<layer name="advise_text" enabled="false" keep="true" vr="true" devices="mobile" type="text" html="请横置手机并放入到眼镜" bg="false" vcenter="true" css="text-align: center;line-height: 30px; color: #FFFFFF; font-size: 16px;" y="50" align="center" height="30" width="220" />
+	</layer>
+
+  <events name="skin_webvr_events" keep="true" devices="html5"
+          onresize.mobile="skin_webvr_act_as_gyro_in_portrait_mode();"
+          onloadcomplete="removelayer(webvr_enterbutton);
+			removelayer(webvr_exitbutton);
+			removelayer(webvr_setupbutton);"
+  />
+  <action name="skin_webvr_onavailable" scope="local">
+		if(webvr.isgearvr,
+			<!-- show a special enter VR screen for Gear VR browsers (Oculus Browser or Samsung Internet VR) -->
+			set(layer[webvr_enterbutton],
+				align=center, y=0, padding='10 20',
+				css=calc(skin_settings.design_text_css + ' font-size:20px;text-align:center;'),
+				html=calc('[i]'+global.title+'[/i][br][span style="font-size:40px"]Enter VR[span]'),
+			);
+			skin_hideskin(instant);
+		  ,
+			<!-- remove the enter vr button from the webvr.xml -->
+			removelayer(webvr_enterbutton);
+			removelayer(webvr_exitbutton);
+			removelayer(webvr_setupbutton);
+		);
+    webvr_onavailable();
+	</action>
+
+	<action name="skin_webvr_setup">
+		if(webvr.isenabled,
+			skin_webvr_act_as_gyro_in_portrait_mode(true);
+			if(scene.count GT 1,
+				skin_vr_control_setvisibility(true);
+				set(events[skin_webvr_events].onviewchange, skin_vr_control_action_following());
+			);
+		  ,
+			if(layer[webvr_rotate_to_landscape_request], tween(layer[webvr_rotate_to_landscape_request].alpha, 0.0, 0.0); );
+			skin_vr_control_setvisibility(false);
+			set(events[skin_webvr_events].onviewchange, null);
+		);
+	</action>
+
+	<action name="skin_webvr_act_as_gyro_in_portrait_mode" scope="local" args="setupcall">
+		if(device.mobile AND webvr.isenabled,
+			div(aspect, stagewidth, stageheight);
+			if(aspect != lastaspect OR setupcall == true,
+				copy(lastaspect, aspect);
+				if(stagewidth GT stageheight,
+					<!-- landscape orientation - use stereo rendering and a direct/fast gyro sensor mode -->
+					set(display.stereo, true);
+					set(webvr.mobilevr_sensor_mode, 3);
+					webvr.update();
+					tween(layer[webvr_rotate_to_landscape_request].alpha, 0.0, 0.0);
+				  ,
+					<!-- portrait orientation - use normal rendering and a smoother/slower gyro sensor mode -->
+					set(display.stereo, false);
+					set(webvr.mobilevr_sensor_mode, 1);
+					webvr.update();
+					tween(layer[webvr_rotate_to_landscape_request].alpha, 1.0);
+				);
+			);
+		,
+			set(lastaspect, 0);
+		);
+	</action>
+
+		<action name="vr_setup" scope="local">
+
+		<!-- store the setup settings in a 'vrsetup' object -->
+		if(webvr.vrsetup === null, def(webvr.vrsetup, object); );
+		copy(vrs, webvr.vrsetup);
+
+		<!-- disable cursor -->
+		set(webvr.vr_cursor_enabled, false);
+
+		<!-- hide VR buttons -->
+		tween(layer[webvr_exitbutton].alpha,0);
+		tween(layer[webvr_setupbutton].alpha,0);
+
+		<!-- create darken-background layer -->
+		addlayer(vr_setup_darken);
+		set(layer[vr_setup_darken], type='container', safearea=false, bgcolor=0x000000, bgalpha=0.5, bgcapture=true, handcursor=false, align='lefttop', width='100%', height='100%', zorder=99998);
+
+		<!-- create element container -->
+		addlayer(vr_setup_bg);
+		set(layer[vr_setup_bg], type='container', handcursor=false, align='lefttop', width='100%', height='100%', zorder=99999);
+
+
+		<!-- get and prepare device infos and settings -->
+		copy(i_screensize, webvr.mobilevr_screensize);
+		if(i_screensize == 'auto', copy(i_screensize, webvr.devicesize));
+		if(i_screensize LE 0, set(i_screensize, 5.0));
+		roundval(i_screensize, 1);
+		txtadd(i_screensize, ' inch');
+
+		copy(i_ipd, webvr.mobilevr_ipd);
+		roundval(i_ipd, 1);
+		txtadd(i_ipd, ' mm');
+
+		copy(i_fov, webvr.mobilevr_lens_fov);
+		roundval(i_fov, 1);
+
+		copy(i_dist, webvr.mobilevr_lens_dist);
+		roundval(i_dist, 2);
+
+		copy(i_dist2, webvr.mobilevr_lens_dist2);
+		txtsplit(i_dist2, '|', vrs.i_dist2_k1, vrs.i_dist2_k2, vrs.i_dist2_k3, vrs.i_dist2_k4);
+		mul(vrs.i_dist2_k1,1);
+		mul(vrs.i_dist2_k2,10);
+		mul(vrs.i_dist2_k3,10);
+		mul(vrs.i_dist2_k4,10);
+		roundval(vrs.i_dist2_k1,2);
+		roundval(vrs.i_dist2_k2,2);
+		roundval(vrs.i_dist2_k3,2);
+		roundval(vrs.i_dist2_k4,2);
+
+		copy(i_vig, webvr.mobilevr_lens_vign);
+		roundval(i_vig, 0);
+
+		copy(i_overlap, webvr.mobilevr_lens_overlap);
+		roundval(i_overlap, 2);
+
+		copy(i_ca, webvr.mobilevr_lens_ca);
+		roundval(i_ca, 3);
+
+		set(i_headset, 'Custom');
+		for(set(i,0), i LT vrheadsets.headset.count, inc(i),
+			copy(hs, vrheadsets.headset[get(i)]);
+			if(i_overlap == hs.overlap AND i_fov == hs.fov AND i_dist == hs.dist AND i_dist2 == hs.dist2 AND i_ca == hs.ca AND i_vig == hs.vig,
+				copy(i_headset, hs.caption);
+			);
+		 );
+
+		<!-- when the screen size is unknown, mark it red -->
+		set(known_size, true);
+		set(sizcol, #FFFFFF);
+		copy(i_devicename, webvr.devicename);
+		if(i_devicename == 'Unknown',
+			if(webvr.mobilevr_screensize == 'auto',
+				set(sizcol, #AA0000);
+				set(known_size, false);
+			  ,
+				set(i_devicename, 'Custom');
+			);
+		);
+
+
+		<!-- create layer for the main menu -->
+		addlayer(vr_setup_m1);
+		set(layer[vr_setup_m1], type='container', parent='vr_setup_bg', align='lefttop', width='100%', height='100%');
+
+		<!-- create layer for the headset customization menu -->
+		addlayer(vr_setup_m3);
+		set(layer[vr_setup_m3], type='container', parent='vr_setup_bg', align='lefttop', width='100%', height='100%', visible=false);
+
+		<!-- create layer for the calibration menu -->
+		addlayer(vr_setup_m2);
+		set(layer[vr_setup_m2], type='container', parent='vr_setup_bg', align='lefttop', width='100%', height='100%', visible=false);
+
+		<!-- create the text elements -->
+		set(vrs.vr_setup_text_parent, 'vr_setup_m1');
+		vr_setup_createtext(vr_setup_title, 'VR 参数设置',       center, center, 0, -225, #FFFFFF,     false);
+
+		vr_setup_createtext(vr_setup_dvn1, '设备:',         center, right,  0, -145, #FFFFFF,     true, vr_setup_select('screen') );
+		vr_setup_createtext(vr_setup_dvn2, get(i_devicename), center, left,   0, -145, get(sizcol), true, vr_setup_select('screen') );
+		vr_setup_createtext(vr_setup_siz1, '屏幕尺寸:',     center, right,  0, -105, #FFFFFF,     true, vr_setup_select('screen') );
+		vr_setup_createtext(vr_setup_siz2, get(i_screensize), center, left,   0, -105, get(sizcol), true, vr_setup_select('screen') );
+
+		vr_setup_createtext(vr_setup_ipd1, '瞳距:',            center, right,  0,  -35, #FFFFFF,     true, vr_setup_select('ipd') );
+		vr_setup_createtext(vr_setup_ipd2, get(i_ipd),        center, left,   0,  -35, #FFFFFF,     true, vr_setup_select('ipd') );
+
+		vr_setup_createtext(vr_setup_hmd1, 'VR 设备:',     center, right,  0,  +35, #FFFFFF,     true, vr_setup_select('headset') );
+		vr_setup_createtext(vr_setup_hmd2, get(i_headset),    center, left,   0,  +35, #FFFFFF,     true, vr_setup_select('headset') );
+
+		vr_setup_createtext(vr_setup_hmd3, '自定义设备',       center, center, 0,  +75, #FFFFFF,     true, set(bg,true), set(bg,false), vr_setup_customize_headset() );
+
+		if(webvr.iswebvr == false,
+			vr_setup_createtext(vr_setup_cal, '重力感应校准',   center, center,    0, +145, #FFFFFF,     true, set(bg,true), set(bg,false), vr_setup_calibration() );
+		);
+
+		vr_setup_createtext(vr_setup_sav, '存储',          center, center, -200, +225, #FFFFFF,     true, set(bg,true), set(bg,false), vr_setup_save() );
+		vr_setup_createtext(vr_setup_rst, '重置',         center, center,    0, +225, #FFFFFF,     true, set(bg,true), set(bg,false), vr_setup_reset() );
+		vr_setup_createtext(vr_setup_cls, '关闭',         center, center, +200, +225, #FFFFFF,     true, set(bg,true), set(bg,false), vr_setup_close() );
+
+		<!-- and the adjusting buttons -->
+		vr_setup_createbutton(vr_setup_btn1, '&#60;', left,  left,  5%, -35, #FFFFFF, true, null);
+		vr_setup_createbutton(vr_setup_btn2, '&#62;', right, right, 5%, -35, #FFFFFF, true, null);
+
+
+		<!-- create the customize_headset text elements -->
+		set(vrs.vr_setup_text_parent, 'vr_setup_m3');
+		vr_setup_createtext(vr_setup_m31, 'VR 设备设置', center, center, 0, -225, #FFFFFF, false);
+
+		vr_setup_createtext(vr_setup_fov1,  '视野:',           center, right,  0,  -80,  #FFFFFF,    true, vr_setup_select('fov') );
+		vr_setup_createtext(vr_setup_fov2, get(i_fov),        center, left,   0,  -80,  #FFFFFF,    true, vr_setup_select('fov') );
+		vr_setup_createtext(vr_setup_dst1, '视野畸变:',     center, right,  0,  -32,  #FFFFFF,    true, vr_setup_select('dist') );
+		vr_setup_createtext(vr_setup_dst2, get(i_dist),       center, left,   0,  -32,  #FFFFFF,    true, vr_setup_select('dist') );
+		vr_setup_createtext(vr_setup_d2tx, '设备畸变:',          center, right,  0,  +16,  #FFFFFF,    true, vr_setup_select('dist2k1') );
+		vr_setup_createtext(vr_setup_d2k1, get(vrs.i_dist2_k1),   center, left,   0,  +16,  #FFFFFF,    true, vr_setup_select('dist2k1') );
+		vr_setup_createtext(vr_setup_d2k2, get(vrs.i_dist2_k2),   center, left, +100, +16,  #FFFFFF,    true, vr_setup_select('dist2k2') );
+		vr_setup_createtext(vr_setup_d2k3, get(vrs.i_dist2_k3),   center, left, +200, +16,  #FFFFFF,    true, vr_setup_select('dist2k3') );
+		vr_setup_createtext(vr_setup_d2k4, get(vrs.i_dist2_k4),   center, left, +300, +16,  #FFFFFF,    true, vr_setup_select('dist2k4') );
+
+
+		vr_setup_createtext(vr_setup_cac1, 'CA 校准:',        center, right,  0,  +64,  #FFFFFF,    true, vr_setup_select('ca') );
+		vr_setup_createtext(vr_setup_cac2, get(i_ca),         center, left,   0,  +64,  #FFFFFF,    true, vr_setup_select('ca') );
+		vr_setup_createtext(vr_setup_vig1, '插值:',       center, right,  0, +112,  #FFFFFF,    true, vr_setup_select('vignette') );
+		vr_setup_createtext(vr_setup_vig2, get(i_vig),        center, left,   0, +112,  #FFFFFF,    true, vr_setup_select('vignette') );
+		vr_setup_createtext(vr_setup_olp1, '重叠:',        center, right,  0, +160,  #FFFFFF,    true, vr_setup_select('overlap') );
+		vr_setup_createtext(vr_setup_olp2, get(i_overlap),    center, left,   0, +160,  #FFFFFF,    true, vr_setup_select('overlap') );
+
+		vr_setup_createtext(vr_setup_m35, '关闭',       center, center, 0, +225, #FFFFFF, true, set(bg,true), set(bg,false), vr_setup_close_sub_menus() );
+
+
+		<!-- create the calibration text elements -->
+		set(vrs.vr_setup_text_parent, 'vr_setup_m2');
+		vr_setup_createtext(vr_setup_cb1, '重力感应校准', center, center, 0, -225, #FFFFFF, false);
+		vr_setup_createtext(vr_setup_cb2, '将设备置于水平面[br]保持水平并点击校准', center, center, 0, -95, #FFFFFF, false, vr_setup_select('screen') );
+		vr_setup_createtext(vr_setup_cb3, '开始校准',   center, center, 0,  +55, #FFFFFF, true, set(bg,true), set(bg,false), vr_setup_do_calibration() );
+		vr_setup_createtext(vr_setup_cb4, '重置设置',       center, center, 0, +125, #FFFFFF, true, set(bg,true), set(bg,false), webvr.resetcalibration() );
+		vr_setup_createtext(vr_setup_cb5, '关闭',       center, center, 0, +225, #FFFFFF, true, set(bg,true), set(bg,false), vr_setup_close_sub_menus() );
+
+		vr_setup_createtext(vr_setup_cb6, '重力感应校准中',      bottom, center, 0, 40, #FFFFFF, false, null );
+		vr_setup_createtext(vr_setup_cb7, '重力感应校准成功',   bottom, center, 0, 40, #FFFFFF, false, null );
+		vr_setup_createtext(vr_setup_cb8, '重力感应校准失败', bottom, center, 0, 40, #FFFFFF, false, null );
+		set(layer[vr_setup_cb6].autoalpha, true);
+		set(layer[vr_setup_cb7].autoalpha, true);
+		set(layer[vr_setup_cb8].autoalpha, true);
+		set(layer[vr_setup_cb6].alpha, 0.0);
+		set(layer[vr_setup_cb7].alpha, 0.0);
+		set(layer[vr_setup_cb8].alpha, 0.0);
+
+
+		<!-- pre-select the screen size for adjusting when it is unknown, otherwise the IPD -->
+		if(known_size == false,
+			vr_setup_select('screen', true);
+		  ,
+			vr_setup_select('ipd', true);
+		);
+	</action>
+
+  <vrheadsets>
+    <headset name="cb1" caption="谷歌纸板A"   overlap="1.10" fov="96.0"  dist="1.00" dist2="1|0|0|0" ca="0.000" vig="100" />
+    <headset name="cb2" caption="谷歌纸板B"   overlap="1.00" fov="96.0"  dist="0.60" dist2="1|0|0|0" ca="0.000" vig="100" />
+    <headset name="gvr" caption="三星GearVR"        overlap="1.00" fov="112.0" dist="0.95" dist2="1|0|0|0" ca="0.090" vig="100" />
+    <headset name="hom" caption="HOMiDO"        overlap="1.00" fov="101.0" dist="1.10" dist2="1|0|0|0" ca="0.075" vig="100" />
+    <headset name="one" caption="VR ONE"        overlap="1.00" fov="109.9" dist="0.00" dist2="1.139|0.093|0.018|0.207" ca="0.090" vig="35" />
+    <headset name="ccr" caption="ColorCross VR" overlap="1.00" fov="70.0"  dist="0.65" dist2="1|0|0|0" ca="0.000" vig="100" />
+    <headset name="nod" caption="无校正" overlap="1.00" fov="96.0"  dist="0.00" dist2="1|0|0|0" ca="0.000" vig="100" />
+  </vrheadsets>
+</krpano>

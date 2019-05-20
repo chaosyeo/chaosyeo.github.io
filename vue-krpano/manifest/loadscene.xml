@@ -1,0 +1,27 @@
+<krpano>
+    <action name="gotoscene" scope="local" args="scenenameorindex, blendmode">
+        if(scene[get(scenenameorindex)],
+            copy(scenename, scene[get(scenenameorindex)].name);
+            if(scenename !== xml.scene,
+                if(!blendmode,
+                    loadscene(get(scenename), null, MERGE|KEEPVIEW|KEEPMOVING|KEEPDISPLAY|KEEPCONTROL, blendmode);
+                ,
+                    loadscene(get(scenename), null, MERGE|KEEPVIEW|KEEPMOVING|KEEPDISPLAY|KEEPCONTROL, BLEND(1));
+                );
+            );
+        );
+    </action>
+    <action name="nextscene" scope="local" args="offset">
+        add(sceneindex, scene[get(xml.scene)].index, offset);
+        sub(lastsceneindex, scene.count, 1);
+        if(sceneindex LT 0,
+            copy(sceneindex, lastsceneindex);
+        );
+        if(sceneindex GT lastsceneindex,
+            set(sceneindex, 0);
+        );
+        if(sceneindex GE 0 AND sceneindex LT scene.count,
+            gotoscene(get(sceneindex));
+        );
+    </action>
+</krpano>

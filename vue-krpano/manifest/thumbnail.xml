@@ -1,0 +1,163 @@
+<krpano>
+  <layer name="skin_thumbnail" keep="true" type="container" width="100%" height="170" y="50" align="bottom" maskchildren="true">
+    <layer name="skin_thumbnail_mask" keep="true" type="container" width="100%" height="100%" align="bottom" visible="true" status="on" y="0">
+      <layer name="skin_thumbnail_scene" keep="true" type="container" maskchildren="true" width="100%" y="10" height="70" align="lefttop">
+        <layer name="skin_thumbnail_scene_container" keep="true" type="container" align="center" url="../krp/plugins/scrollarea.swf" alturl="../krp/plugins/scrollarea.js" direction="h" height="100%">
+        </layer>
+      </layer>
+      <layer name="skin_thumbnail_group" keep="true" type="container" maskchildren="true" width="100%" y="10" height="70" align="leftbottom">
+        <layer name="skin_thumbnail_group_container" keep="true" type="container" align="center" url="../krp/plugins/scrollarea.swf" alturl="../krp/plugins/scrollarea.js" direction="h" height="100%">
+        </layer>
+      </layer>
+    </layer>
+  </layer>
+
+  <style name="skin_thumbnail_group_container_style" parent="skin_thumbnail_group_container" keep="true" type="container" maskchildren="true" align="left" height="70" width="70" zorder="10" />
+  <style name="skin_thumbnail_group_border_style" keep="true" align="center" height="70" width="70" enabled="false" url="thumbnail_resource/borders.png" crop="0|0|156|156" />
+  <style name="skin_thumbnail_group_label_style" keep="true" type="text" align="bottom" y="8" height="20" width="54" enabled="false" vcenter="true" bg="true" bgalpha="0.2" bgcolor="0x000000" css="line-height:16px;text-align:center;font-size:9px;font-weight:100;color:#FFFFFF;"/>
+  <style name="skin_thumbnail_group_thumbnail_style" keep="true" align="bottom" height="54" width="54" y="8" enabled="true" />
+
+  <style name="skin_thumbnail_scene_container_style" parent="skin_thumbnail_scene_container" keep="true" type="container" maskchildren="true" align="left" height="70" width="70" zorder="10" />
+  <style name="skin_thumbnail_scene_border_style" keep="true" align="center" height="70" width="70" enabled="false" url="thumbnail_resource/borders.png" crop="156|0|156|156" />
+  <style name="skin_thumbnail_scene_label_style" keep="true" type="text" align="bottom" y="8" height="20" width="54" enabled="false" vcenter="true" bg="true" bgalpha="0.2" bgcolor="0x000000" css="line-height:16px;text-align:center;font-size:9px;font-weight:100;color:#FFFFFF;"/>
+  <style name="skin_thumbnail_scene_thumbnail_style" keep="true" align="bottom" height="54" width="54" y="8" enabled="true" />
+
+  <action name="skin_thumbnail_initialize">
+    set(count, 0);
+    for(set(index, 0), index LT group.count, inc(index),
+      inc(count);
+      txtadd(containername, 'skin_thumbnail_group_', get(index), '_container');
+      txtadd(labelname, 'skin_thumbnail_group_', get(index), '_label');
+      txtadd(thumbnailname, 'skin_thumbnail_group_', get(index), '_thumbnail');
+      txtadd(bordername, 'skin_thumbnail_group_', get(index), '_border');
+
+      addlayer(get(containername));
+      layer[get(containername)].loadstyle(skin_thumbnail_group_container_style);
+      mul(x, index, 70);
+      copy(layer[get(containername)].x, x);
+
+      addlayer(get(bordername));
+      layer[get(bordername)].loadstyle(skin_thumbnail_group_border_style);
+      set(layer[get(bordername)].parent, get(containername));
+
+      addlayer(get(thumbnailname));
+      layer[get(thumbnailname)].loadstyle(skin_thumbnail_group_thumbnail_style);
+      copy(layer[get(thumbnailname)].url, group[get(index)].thumburl);
+      set(layer[get(thumbnailname)].parent, get(containername));
+      set(layer[get(thumbnailname)].linkedgroup, get(group[get(index)].name));
+      set(layer[get(thumbnailname)].onclick, skin_thumbnail_loadgroup(linkedgroup));
+
+      addlayer(get(labelname));
+      copy(layer[get(labelname)].html, group[get(index)].title);
+      set(layer[get(labelname)].parent, get(containername));
+      layer[get(labelname)].loadstyle(skin_thumbnail_group_label_style);
+    );
+    mul(containerwidth, count, 70);
+    set(layer[skin_thumbnail_group_container].width, get(containerwidth));
+
+    set(count, 0);
+    for(set(index, 0), index LT scene.count, inc(index),
+      inc(count);
+      txtadd(containername, 'skin_thumbnail_scene_', get(index), '_container');
+      txtadd(bordername, 'skin_thumbnail_scene_', get(index), '_border');
+      txtadd(thumbnailname, 'skin_thumbnail_scene_', get(index), '_thumbnail');
+      txtadd(labelname, 'skin_thumbnail_scene_', get(index), '_label');
+
+      addlayer(get(containername));
+      layer[get(containername)].loadstyle(skin_thumbnail_scene_container_style);
+      mul(x, index, 70);
+      copy(layer[get(containername)].x, x);
+
+      addlayer(get(bordername));
+      layer[get(bordername)].loadstyle(skin_thumbnail_scene_border_style);
+      set(layer[get(bordername)].parent, get(containername));
+
+      addlayer(get(thumbnailname));
+      layer[get(thumbnailname)].loadstyle(skin_thumbnail_scene_thumbnail_style);
+      copy(layer[get(thumbnailname)].url, scene[get(index)].thumburl);
+      set(layer[get(thumbnailname)].parent, get(containername));
+      set(layer[get(thumbnailname)].group, get(scene[get(index)].group));
+      set(layer[get(thumbnailname)].linkedscene, get(scene[get(index)].name));
+      set(layer[get(thumbnailname)].onclick, skin_loadscene(get(linkedscene)));
+
+      addlayer(get(labelname));
+      copy(layer[get(labelname)].html, scene[get(index)].title);
+      set(layer[get(labelname)].parent, get(containername));
+      layer[get(labelname)].loadstyle(skin_thumbnail_scene_label_style);
+    );
+    mul(containerwidth, count, 70);
+    set(layer[skin_thumbnail_scene_container].width, get(containerwidth));
+
+    if(group.count GT 0,
+      skin_thumbnail_loadgroup(group[0].name);
+    ,
+      set(layer['skin_thumbnail_group'].visible, false);
+      set(layer['skin_thumbnail'].height, 90);
+    );
+  </action>
+  <action name="skin_thumbnail_loadgroup">
+    if(%1,
+      copy(currentgroup, %1);
+      for(set(index, 0), index LT group.count, inc(index),
+        layer[get(calc('skin_thumbnail_group_' + index + '_border'))].loadstyle(skin_thumbnail_group_border_style);
+      );
+      set(layer[get(calc('skin_thumbnail_' + currentgroup + '_border'))].crop, '0|156|156|156');
+      set(count, 0);
+      for(set(index, 0), index LT scene.count, inc(index),
+        set(layer[get(calc('skin_thumbnail_scene_' + index + '_container'))].visible, false);
+        if(layer[get(calc('skin_thumbnail_scene_' + index + '_thumbnail'))].group === currentgroup,
+          set(layer[get(calc('skin_thumbnail_scene_' + index + '_container'))].visible, true);
+          set(layer[get(calc('skin_thumbnail_scene_' + index + '_container'))].x, calc(count * 70));
+          inc(count);
+      );
+    );
+    set(layer[skin_thumbnail_scene_container].width, calc(count * 70));
+    );
+  </action>
+  <events name="skin_thumbnail_events" keep="true" onnewscene="skin_thumbnail_sceneloaded()" onmousedown="skin_thumbnail_hide()" />
+  <action name="skin_thumbnail_sceneloaded">
+    set(count, 0);
+    for(set(index, 0), index LT scene.count, inc(index),
+      layer[get(calc('skin_thumbnail_scene_' + index + '_border'))].loadstyle(skin_thumbnail_scene_border_style);
+      if(layer[get(calc('skin_thumbnail_scene_' + index + '_container'))].visible,
+        inc(count);
+      );
+      if(layer[skin_thumbnail_scene_container].loaded,
+        if(xml.scene === scene[get(index)].name,
+          mul(x, count, 70);
+          add(x, -35);
+          layer[skin_thumbnail_scene_container].scrolltocenter(get(x), 0);
+        );
+      );
+    );
+    set(layer[get(calc('skin_thumbnail_' + xml.scene + '_border'))].crop, '156|156|156|156');
+  </action>
+  <action name="skin_thumbnail_switch">
+    if(layer[skin_thumbnail_mask].status === 'off',
+    skin_thumbnail_show();
+    ,
+    skin_thumbnail_hide();
+    );
+  </action>
+  <action name="skin_thumbnail_hide">
+    if(layer[skin_thumbnail_mask].status === 'on',
+      stopdelayedcall(thumbnail);
+      tween(layer[skin_thumbnail_mask].alpha, '0.0', , easeOutQuint);
+      tween(layer[skin_thumbnail_mask].y, '-150', 0.5, easeOutQuint);
+      delayedcall(thumbnail, 0.5,
+        set(layer[skin_thumbnail_mask].alpha, '0.0');
+        set(layer[skin_thumbnail_mask].visible, false);
+        set(layer[skin_thumbnail_mask].status, 'off');
+      );
+    );
+
+  </action>
+  <action name="skin_thumbnail_show">
+    if(layer[skin_thumbnail_mask].status === 'off',
+      set(layer[skin_thumbnail_mask].visible, true);
+      tween(layer[skin_thumbnail_mask].alpha, '1.0', 1.0, easeOutQuint);
+      tween(layer[skin_thumbnail_mask].y, 0, 0.5, easeOutQuint);
+      set(layer[skin_thumbnail_mask].status, 'on');
+    );
+  </action>
+</krpano>
